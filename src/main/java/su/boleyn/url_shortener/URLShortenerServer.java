@@ -61,7 +61,6 @@ public class URLShortenerServer {
 									sb.append("url: " + info.url + "\n");
 									sb.append("createdAt: " + info.createdAt + "\n");
 									sb.append("expiresAt: " + info.expiresAt + "\n\n");
-									System.out.println("here");
 								}
 								exchange.getResponseSender().send(sb.toString());
 							}
@@ -114,6 +113,15 @@ public class URLShortenerServer {
 								c.add(Calendar.DATE, 1);
 								expiresAt = c.getTime();
 							} else {
+								if (exchange.getQueryParameters().get("expires_after") != null
+										&& exchange.getQueryParameters().get("expires_after").size() == 1
+										&& isInt(exchange.getQueryParameters().get("expires_after").getFirst())) {
+									Calendar c = Calendar.getInstance();
+									c.setTime(createdAt);
+									c.add(Calendar.SECOND, Integer
+											.parseInt(exchange.getQueryParameters().get("expires_after").getFirst()));
+									expiresAt = c.getTime();
+								}
 								expiresAt = null;
 							}
 
@@ -133,6 +141,14 @@ public class URLShortenerServer {
 							sb.append("createdAt: " + info.createdAt + "\n");
 							sb.append("expiresAt: " + info.expiresAt + "\n\n");
 							exchange.getResponseSender().send(sb.toString());
+						}
+						boolean isInt(String s) {
+							try {
+								Integer.parseInt(s);
+							} catch (Exception e) {
+								return false;
+							}
+							return true;
 						}
 					}))).addExceptionHandler(Exception.class, new HttpHandler() {
 						@Override
