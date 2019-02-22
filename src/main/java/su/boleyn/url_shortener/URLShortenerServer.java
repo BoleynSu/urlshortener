@@ -39,7 +39,7 @@ public class URLShortenerServer {
 								exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
 								exchange.getResponseSender().send("404 Not Found");
 							} else {
-								exchange.setStatusCode(301);
+								exchange.setStatusCode(302);
 								exchange.getResponseHeaders().put(Headers.LOCATION, url);
 							}
 						}
