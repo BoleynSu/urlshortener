@@ -98,10 +98,7 @@ public class URLShortenerServer {
 
 							Date createdAt = new Date();
 							Date expiresAt;
-							if (exchange.getQueryParameters().get("expires_at") != null
-									&& exchange.getQueryParameters().get("expires_at").size() == 1) {
-								expiresAt = null;
-							} else if (exchange.getQueryParameters().get("month") != null) {
+							if (exchange.getQueryParameters().get("month") != null) {
 								Calendar c = Calendar.getInstance();
 								c.setTime(createdAt);
 								c.add(Calendar.MONTH, 1);
