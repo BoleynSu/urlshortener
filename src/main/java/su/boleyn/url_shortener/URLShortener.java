@@ -37,7 +37,7 @@ public class URLShortener {
 					throw new RuntimeException("the database is ill-formed");
 				}
 				URLInfo info = new URLInfo();
-				info.code = URLDecoder.decode(records[0], "utf-8");
+				info.code = URLDecoder.decode(records[0], "UTF-8");
 				info.url = records[1];
 				info.createdAt = new Date(Long.parseLong(records[2]));
 				if (records.length == 4) {
@@ -95,7 +95,7 @@ public class URLShortener {
 	public void shorten(URLInfo info) throws UnsupportedEncodingException {
 		addURLInfo(info);
 		out.println("#" + info.createdAt + "\t" + info.expiresAt);
-		out.println(URLEncoder.encode(info.code, "utf-8") + "\t" + info.url + "\t" + info.createdAt.getTime()
+		out.println(URLEncoder.encode(info.code, "UTF-8") + "\t" + info.url + "\t" + info.createdAt.getTime()
 				+ (info.expiresAt == null ? "" : "\t" + info.expiresAt.getTime()));
 	}
 }
