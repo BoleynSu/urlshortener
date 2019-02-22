@@ -83,11 +83,9 @@ public class URLShortenerServer {
 							String code = exchange.getRelativePath();
 
 							String url;
-							if (exchange.getQueryParameters().get("url") != null
-									&& exchange.getQueryParameters().get("url").size() == 1
-									&& UrlValidator.getInstance()
-											.isValid(exchange.getQueryParameters().get("url").getFirst())) {
-								url = exchange.getQueryParameters().get("url").getFirst();
+							if (exchange.getQueryParameters().get("url") != null && UrlValidator.getInstance()
+									.isValid(exchange.getQueryParameters().get("url").getLast())) {
+								url = exchange.getQueryParameters().get("url").getLast();
 							} else {
 								exchange.setStatusCode(400);
 								exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
@@ -112,13 +110,18 @@ public class URLShortenerServer {
 								c.setTime(createdAt);
 								c.add(Calendar.DATE, 1);
 								expiresAt = c.getTime();
-							} else if (exchange.getQueryParameters().get("expires_after") != null
-									&& exchange.getQueryParameters().get("expires_after").size() == 1
-									&& isInt(exchange.getQueryParameters().get("expires_after").getFirst())) {
+							} else if (exchange.getQueryParameters().get("expires_after") != null) {
 								Calendar c = Calendar.getInstance();
 								c.setTime(createdAt);
-								c.add(Calendar.SECOND, Integer
-										.parseInt(exchange.getQueryParameters().get("expires_after").getFirst()));
+								try {
+									c.add(Calendar.SECOND, Integer
+											.parseInt(exchange.getQueryParameters().get("expires_after").getLast()));
+								} catch (Exception e) {
+									exchange.setStatusCode(400);
+									exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
+									exchange.getResponseSender().send("400 Bad Request ");
+									return;
+								}
 								expiresAt = c.getTime();
 							} else {
 								expiresAt = null;
@@ -140,15 +143,6 @@ public class URLShortenerServer {
 							sb.append("createdAt: " + info.createdAt + "\n");
 							sb.append("expiresAt: " + info.expiresAt + "\n\n");
 							exchange.getResponseSender().send(sb.toString());
-						}
-
-						boolean isInt(String s) {
-							try {
-								Integer.parseInt(s);
-							} catch (Exception e) {
-								return false;
-							}
-							return true;
 						}
 					}))).addExceptionHandler(Exception.class, new HttpHandler() {
 						@Override
