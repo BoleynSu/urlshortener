@@ -12,6 +12,7 @@ import org.apache.commons.validator.routines.UrlValidator;
 
 import io.undertow.Handlers;
 import io.undertow.Undertow;
+import io.undertow.security.idm.IdentityManager;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.ExceptionHandler;
@@ -20,16 +21,33 @@ import io.undertow.util.Headers;
 public class URLShortenerServer {
 	ReadWriteLock lock;
 	URLShortener shortener;
+	IdentityManager identityManager;
 	Undertow server;
 
-	public URLShortenerServer(String db, int port) {
+	private HttpHandler addBasicAuthByLDAP(HttpHandler next) {
+		return new BasicAuthByLDAPHandler(next, identityManager);
+	}
+
+	private HttpHandler addReadLock(HttpHandler next) {
+		return new LockHandler(lock.readLock(), next);
+	}
+
+	private HttpHandler addWriteLock(HttpHandler next) {
+		return new LockHandler(lock.writeLock(), next);
+	}
+
+	public URLShortenerServer(String db, int port, String host, String ldapHost, String ldapBase,
+			String ldapAdminUsername, String ldapAdminPassword) {
+
 		try {
 			lock = new ReentrantReadWriteLock();
 
 			shortener = new URLShortener(db);
 
-			server = Undertow.builder().addHttpListener(port, "localhost").setHandler(Handlers.exceptionHandler(
-					Handlers.path().addPrefixPath("/", new LockHandler(lock.readLock(), new HttpHandler() {
+			identityManager = new LDAPIdentityManager(ldapHost, ldapBase, ldapAdminUsername, ldapAdminPassword);
+
+			server = Undertow.builder().addHttpListener(port, host).setHandler(
+					Handlers.exceptionHandler(Handlers.path().addPrefixPath("/", addReadLock(new HttpHandler() {
 						@Override
 						public void handleRequest(final HttpServerExchange exchange) throws Exception {
 							String code = exchange.getRelativePath();
@@ -43,7 +61,7 @@ public class URLShortenerServer {
 								exchange.getResponseHeaders().put(Headers.LOCATION, url);
 							}
 						}
-					})).addPrefixPath("/history", new LockHandler(lock.readLock(), new HttpHandler() {
+					})).addPrefixPath("/history", addReadLock(new HttpHandler() {
 						@Override
 						public void handleRequest(final HttpServerExchange exchange) throws Exception {
 							String code = exchange.getRelativePath();
@@ -65,7 +83,7 @@ public class URLShortenerServer {
 								exchange.getResponseSender().send(sb.toString());
 							}
 						}
-					})).addPrefixPath("/list", new LockHandler(lock.readLock(), new HttpHandler() {
+					})).addPrefixPath("/list", addBasicAuthByLDAP(addReadLock(new HttpHandler() {
 						@Override
 						public void handleRequest(final HttpServerExchange exchange) throws Exception {
 							exchange.setStatusCode(200);
@@ -77,7 +95,7 @@ public class URLShortenerServer {
 							}
 							exchange.getResponseSender().send(sb.toString());
 						}
-					})).addPrefixPath("/create", new LockHandler(lock.writeLock(), new HttpHandler() {
+					}))).addPrefixPath("/create", addBasicAuthByLDAP(addWriteLock(new HttpHandler() {
 						@Override
 						public void handleRequest(final HttpServerExchange exchange) throws Exception {
 							String code = exchange.getRelativePath();
@@ -144,7 +162,7 @@ public class URLShortenerServer {
 							sb.append("expiresAt: " + info.expiresAt + "\n\n");
 							exchange.getResponseSender().send(sb.toString());
 						}
-					}))).addExceptionHandler(Exception.class, new HttpHandler() {
+					})))).addExceptionHandler(Exception.class, new HttpHandler() {
 						@Override
 						public void handleRequest(HttpServerExchange exchange) throws Exception {
 							exchange.setStatusCode(500);
@@ -164,6 +182,9 @@ public class URLShortenerServer {
 
 	public static void main(final String[] args) {
 		new URLShortenerServer(System.getProperty("url-shortener-db", "url-shortener-db"),
-				Integer.parseInt(System.getProperty("url-shortener-port", "8080"))).start();
+				Integer.parseInt(System.getProperty("url-shortener-port", "8080")),
+				System.getProperty("url-shortener-host", "localhost"), System.getProperty("url-shortener-ldapHost"),
+				System.getProperty("url-shortener-ldapBase"), System.getProperty("url-shortener-ldapAdminUsername"),
+				System.getProperty("url-shortener-ldapAdminPassword")).start();
 	}
 }
