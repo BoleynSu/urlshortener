@@ -92,7 +92,7 @@ public class LDAPIdentityManager implements IdentityManager {
 				if (results.hasMoreElements()) {
 					return null;
 				}
-				String username = searchResult.getNameInNamespace();
+				final String username = searchResult.getNameInNamespace();
 				return new Account() {
 					private final Principal principal = new Principal() {
 						@Override
