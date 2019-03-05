@@ -50,14 +50,12 @@ public class LDAPIdentityManager implements IdentityManager {
 
 	@Override
 	public Account verify(String id, Credential credential) {
-		try {
-			Account account = getAccount(id);
-			if (account != null && verifyCredential(account, credential)) {
-				return account;
-			}
-		} catch (NamingException e) {
+		Account account = getAccount(id);
+		if (account != null && verifyCredential(account, credential)) {
+			return account;
+		} else {
+			return null;
 		}
-		return null;
 	}
 
 	@Override
@@ -80,36 +78,54 @@ public class LDAPIdentityManager implements IdentityManager {
 	}
 
 	@SuppressWarnings("serial")
-	private Account getAccount(final String id) throws NamingException {
-		String searchFilter = "(&(objectClass=posixAccount)(uid=" + id + "))";
-		SearchControls searchControls = new SearchControls();
-		searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-		NamingEnumeration<SearchResult> results = getLdapContext(ldapAdminUsername, ldapAdminPassword).search(ldapBase,
-				searchFilter, searchControls);
-		if (results.hasMoreElements()) {
-			SearchResult searchResult = (SearchResult) results.nextElement();
+	private Account getAccount(final String id) {
+		LdapContext ctx = null;
+		NamingEnumeration<SearchResult> results = null;
+		try {
+			String searchFilter = "(&(objectClass=posixAccount)(uid=" + id + "))";
+			SearchControls searchControls = new SearchControls();
+			searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+			ctx = getLdapContext(ldapAdminUsername, ldapAdminPassword);
+			results = ctx.search(ldapBase, searchFilter, searchControls);
 			if (results.hasMoreElements()) {
-				return null;
-			}
-			String username = searchResult.getNameInNamespace();
-			return new Account() {
-				private final Principal principal = new Principal() {
+				SearchResult searchResult = (SearchResult) results.nextElement();
+				if (results.hasMoreElements()) {
+					return null;
+				}
+				String username = searchResult.getNameInNamespace();
+				return new Account() {
+					private final Principal principal = new Principal() {
+						@Override
+						public String getName() {
+							return username;
+						}
+					};
+
 					@Override
-					public String getName() {
-						return username;
+					public Principal getPrincipal() {
+						return principal;
+					}
+
+					@Override
+					public Set<String> getRoles() {
+						return Collections.emptySet();
 					}
 				};
-
-				@Override
-				public Principal getPrincipal() {
-					return principal;
+			}
+		} catch (NamingException e) {
+		} finally {
+			try {
+				if (results != null) {
+					results.close();
 				}
-
-				@Override
-				public Set<String> getRoles() {
-					return Collections.emptySet();
+			} catch (NamingException e) {
+			}
+			try {
+				if (ctx != null) {
+					ctx.close();
 				}
-			};
+			} catch (NamingException e) {
+			}
 		}
 		return null;
 	}
