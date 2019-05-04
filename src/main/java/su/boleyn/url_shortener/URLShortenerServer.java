@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.validator.routines.UrlValidator;
 
 import io.undertow.Handlers;
