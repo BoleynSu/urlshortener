@@ -14,12 +14,11 @@ import io.undertow.security.impl.BasicAuthenticationMechanism;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 
-class BasicAuthByLDAPHandler implements HttpHandler {
+class BasicAuth implements HttpHandler {
+	private HttpHandler next;
+	private IdentityManager identityManager;
 
-	HttpHandler next;
-	IdentityManager identityManager;
-
-	public BasicAuthByLDAPHandler(HttpHandler next, IdentityManager identityManager) {
+	public BasicAuth(HttpHandler next, IdentityManager identityManager) {
 		this.next = next;
 		this.identityManager = identityManager;
 	}

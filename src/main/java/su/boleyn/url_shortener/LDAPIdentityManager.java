@@ -19,10 +19,10 @@ import io.undertow.security.idm.IdentityManager;
 import io.undertow.security.idm.PasswordCredential;
 
 public class LDAPIdentityManager implements IdentityManager {
-	String ldapHost;
-	String ldapBase;
-	String ldapAdminUsername;
-	String ldapAdminPassword;
+	private String ldapHost;
+	private String ldapBase;
+	private String ldapAdminUsername;
+	private String ldapAdminPassword;
 
 	public LDAPIdentityManager(String ldapHost, String ldapBase, String ldapAdminUsername, String ldapAdminPassword)
 			throws NamingException {
@@ -92,7 +92,7 @@ public class LDAPIdentityManager implements IdentityManager {
 				if (results.hasMoreElements()) {
 					return null;
 				}
-				final String username = searchResult.getNameInNamespace();
+				String username = searchResult.getNameInNamespace();
 				return new Account() {
 					private final Principal principal = new Principal() {
 						@Override

@@ -6,8 +6,8 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 
 public class LockHandler implements HttpHandler {
-	Lock lock;
-	HttpHandler next;
+	private Lock lock;
+	private HttpHandler next;
 
 	public LockHandler(Lock lock, HttpHandler next) {
 		this.lock = lock;

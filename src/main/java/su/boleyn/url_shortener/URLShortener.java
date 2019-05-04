@@ -18,8 +18,8 @@ import java.util.Scanner;
 import java.util.TreeMap;
 
 public class URLShortener {
-	Map<String, ArrayList<URLInfo>> map;
-	PrintWriter out;
+	private Map<String, ArrayList<URLInfo>> map;
+	private PrintWriter out;
 
 	public URLShortener(String db) throws IOException {
 		map = new HashMap<String, ArrayList<URLInfo>>();
@@ -52,7 +52,7 @@ public class URLShortener {
 		out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true))), true);
 	}
 
-	String getURL(ArrayList<URLInfo> history) {
+	private String getURL(ArrayList<URLInfo> history) {
 		if (history == null) {
 			return null;
 		} else {
@@ -85,7 +85,7 @@ public class URLShortener {
 		return list;
 	}
 
-	void addURLInfo(URLInfo info) {
+	private void addURLInfo(URLInfo info) {
 		if (!map.containsKey(info.code)) {
 			map.put(info.code, new ArrayList<URLInfo>());
 		}
