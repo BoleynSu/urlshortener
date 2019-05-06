@@ -180,9 +180,9 @@ public class URLShortenerServer {
 	}
 
 	public static void main(final String[] args) {
-		new URLShortenerServer(System.getProperty("url-shortener-db", "url-shortener-db"),
-				Integer.parseInt(System.getProperty("url-shortener-port", "8080")),
-				System.getProperty("url-shortener-host", "localhost"), System.getProperty("url-shortener-username"),
-				System.getProperty("url-shortener-password")).start();
+		new URLShortenerServer(System.getProperty("urlshortener-db", "urlshortener-db"),
+				Integer.parseInt(System.getProperty("urlshortener-port", "8080")),
+				System.getProperty("urlshortener-host", "localhost"), System.getProperty("urlshortener-username"),
+				System.getProperty("urlshortener-password")).start();
 	}
 }
