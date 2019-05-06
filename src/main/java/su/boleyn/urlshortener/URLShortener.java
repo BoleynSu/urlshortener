@@ -1,4 +1,4 @@
-package su.boleyn.url_shortener;
+package su.boleyn.urlshortener;
 
 import java.io.BufferedWriter;
 import java.io.File;

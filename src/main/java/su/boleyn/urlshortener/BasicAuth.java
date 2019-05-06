@@ -1,4 +1,4 @@
-package su.boleyn.url_shortener;
+package su.boleyn.urlshortener;
 
 import java.util.Collections;
 import java.util.List;
