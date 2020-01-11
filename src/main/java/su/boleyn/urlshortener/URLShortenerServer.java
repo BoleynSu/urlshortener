@@ -15,17 +15,20 @@ import io.undertow.Undertow;
 import io.undertow.security.idm.IdentityManager;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
+import io.undertow.server.handlers.CookieImpl;
 import io.undertow.server.handlers.ExceptionHandler;
+import io.undertow.server.session.SecureRandomSessionIdGenerator;
 import io.undertow.util.Headers;
 
 public class URLShortenerServer {
 	private ReadWriteLock lock;
 	private URLShortener shortener;
 	private IdentityManager identityManager;
+	private SecureRandomSessionIdGenerator tokenGenerator;
 	private Undertow server;
 
 	private HttpHandler addBasicAuth(HttpHandler next) {
-		return new BasicAuth(next, identityManager);
+		return new BasicAuthHandler(next, identityManager);
 	}
 
 	private HttpHandler addReadLock(HttpHandler next) {
@@ -44,6 +47,8 @@ public class URLShortenerServer {
 			shortener = new URLShortener(db);
 
 			identityManager = new PasswordIdentityManager(username, password);
+
+			tokenGenerator = new SecureRandomSessionIdGenerator();
 
 			server = Undertow.builder().addHttpListener(port, host).setHandler(
 					Handlers.exceptionHandler(Handlers.path().addPrefixPath("/", addReadLock(new HttpHandler() {
@@ -142,6 +147,16 @@ public class URLShortenerServer {
 								expiresAt = c.getTime();
 							} else {
 								expiresAt = null;
+							}
+
+							if (exchange.getQueryParameters().get("token") == null || exchange.getRequestCookies().get("token") == null || !exchange.getQueryParameters().get("token").getLast().equals(exchange.getRequestCookies().get("token").getValue())) {
+								String token = tokenGenerator.createSessionId();
+								exchange.setStatusCode(400);
+								exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/html");
+								exchange.getResponseHeaders().put(Headers.X_FRAME_OPTIONS, "deny");
+								exchange.setResponseCookie(new CookieImpl("token", token));
+								exchange.getResponseSender().send("<!DOCTYPE html><title>Confirm</title><a href='" + exchange.getRequestURI() + "?" + exchange.getQueryString() + "&token=" + token + "'>Confirm</a>");
+								return;
 							}
 
 							URLInfo info = new URLInfo();
