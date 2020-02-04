@@ -65,7 +65,7 @@ public class URLShortenerServer {
 								exchange.getResponseHeaders().put(Headers.LOCATION, url);
 							}
 						}
-					})).addPrefixPath("/history", addReadLock(new HttpHandler() {
+					})).addPrefixPath("/history", addBasicAuth(addReadLock(new HttpHandler() {
 						@Override
 						public void handleRequest(final HttpServerExchange exchange) throws Exception {
 							String code = exchange.getRelativePath();
@@ -87,7 +87,7 @@ public class URLShortenerServer {
 								exchange.getResponseSender().send(sb.toString());
 							}
 						}
-					})).addPrefixPath("/list", addBasicAuth(addReadLock(new HttpHandler() {
+					}))).addPrefixPath("/list", addBasicAuth(addReadLock(new HttpHandler() {
 						@Override
 						public void handleRequest(final HttpServerExchange exchange) throws Exception {
 							exchange.setStatusCode(200);
