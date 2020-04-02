@@ -15,7 +15,6 @@ import io.undertow.server.HttpServerExchange;
 
 class BasicAuthHandler implements HttpHandler {
 	private HttpHandler next;
-	private IdentityManager identityManager;
 
 	public BasicAuthHandler(HttpHandler next, IdentityManager identityManager) {
 		HttpHandler handler = next;
@@ -24,7 +23,6 @@ class BasicAuthHandler implements HttpHandler {
 		handler = new AuthenticationMechanismsHandler(handler, Collections.<AuthenticationMechanism>singletonList(new BasicAuthenticationMechanism("su.boleyn.urlshortener")));
 		handler = new SecurityInitialHandler(AuthenticationMode.PRO_ACTIVE, identityManager, handler);
 		this.next = handler;
-		this.identityManager = identityManager;
 	}
 
 	@Override
