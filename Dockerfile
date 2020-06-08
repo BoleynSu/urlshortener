@@ -5,7 +5,7 @@ WORKDIR /build
 COPY ./ ./
 RUN mvn package
 RUN mvn help:evaluate -q -Dexpression=project.version -DforceStdout > out/version
-RUN mv target/urlshortener-$(cat version)-jar-with-dependencies.jar out/urlshortener.jar
+RUN mv target/urlshortener-$(cat out/version)-jar-with-dependencies.jar out/urlshortener.jar
 
 FROM openjdk
 ENV APPROOT=/boleyn.su/opt/boleyn.su/urlshortener
