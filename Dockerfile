@@ -1,5 +1,4 @@
 FROM maven as build
-RUN mkdir -p $HOME/.m2 && echo '<settings><mirrors><mirror><id>google-maven-central</id><name>GCS Maven Central mirror</name><url>https://maven-central.storage-download.googleapis.com/maven2/</url><mirrorOf>central</mirrorOf></mirror></mirrors></settings>' > $HOME/.m2/settings.xml
 RUN mkdir -p /build/out
 WORKDIR /build
 COPY ./ ./
