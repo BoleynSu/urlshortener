@@ -1,20 +1,20 @@
 FROM maven as build
-RUN mkdir -p /build/out
+RUN useradd builder
 WORKDIR /build
-COPY ./ ./
+RUN chown builder:builder /build
+USER builder
+COPY --chown=builder ./ ./
+
 RUN mvn package
+RUN mkdir -p out
 RUN mvn help:evaluate -q -Dexpression=project.version -DforceStdout > out/version
 RUN mv target/urlshortener-$(cat out/version)-jar-with-dependencies.jar out/urlshortener.jar
 
 FROM openjdk
-ENV APPROOT=/boleyn.su/opt/boleyn.su/urlshortener
-RUN mkdir -p $APPROOT
-WORKDIR $APPROOT
-
-COPY  --from=build /build/out $APPROOT
+COPY --from=build /build/out /urlshortener
 
 RUN useradd -r urlshortener
-USER urlshortener:urlshortener
+USER urlshortener
 VOLUME /data
 EXPOSE 8080
 
@@ -25,8 +25,8 @@ ENV DB /data/db
 # ENV PASSWORD
 
 CMD java -Durlshortener-host=$ADDRESS \
-                  -Durlshortener-port=$PORT \
-                  -Durlshortener-db=$DB \
-                  -Durlshortener-username=$USERNAME \
-                  -Durlshortener-password=$PASSWORD \
-                  -jar /boleyn.su/opt/boleyn.su/urlshortener/urlshortener.jar
+         -Durlshortener-port=$PORT \
+         -Durlshortener-db=$DB \
+         -Durlshortener-username=$USERNAME \
+         -Durlshortener-password=$PASSWORD \
+         -jar /urlshortener/urlshortener.jar
