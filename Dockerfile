@@ -1,4 +1,4 @@
-FROM maven:latest@sha256:8a6fab5e7978123a972eefd4680940b3a86230312a87c48d4982b9e5731106f0 as build
+FROM maven@sha256:8cf35e3e17d946b3cb51acc34c501fc8a2a07dc478c153743a50ae8d3b4783ee as build
 RUN useradd builder
 WORKDIR /build
 RUN chown builder:builder /build
@@ -10,7 +10,7 @@ RUN mkdir -p out
 RUN mvn help:evaluate -q -Dexpression=project.version -DforceStdout > out/version
 RUN mv target/urlshortener-$(cat out/version)-jar-with-dependencies.jar out/urlshortener.jar
 
-FROM openjdk:latest@sha256:5f6ced07ffe9349844364b78ddfc80e0632e40d4f5daac1ad7cd3bee9a0357ea
+FROM openjdk@sha256:b25df6e6048e8c4995530d8e5b3e9b1468dcf642f1ba4baac89a4f3ca025f2be
 COPY --from=build /build/out /urlshortener
 
 RUN useradd -r urlshortener
