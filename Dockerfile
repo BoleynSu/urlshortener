@@ -10,7 +10,7 @@ RUN mkdir -p out
 RUN mvn help:evaluate -q -Dexpression=project.version -DforceStdout > out/version
 RUN mv target/urlshortener-$(cat out/version)-jar-with-dependencies.jar out/urlshortener.jar
 
-FROM openjdk@sha256:977a500de4c20cd6e209de2c18c1b96f935a922526cd38eeeaea18193938f503
+FROM openjdk@sha256:d939191db6041b0a2a72b3545f21f603b3e5bbb173733f9193b35fd690ed347d
 RUN microdnf install -y shadow-utils && microdnf clean all
 COPY --from=build /build/out /urlshortener
 
