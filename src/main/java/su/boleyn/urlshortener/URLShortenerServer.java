@@ -149,7 +149,7 @@ public class URLShortenerServer {
 								expiresAt = null;
 							}
 
-							if (exchange.getQueryParameters().get("token") == null || exchange.getRequestCookies().get("token") == null || !exchange.getQueryParameters().get("token").getLast().equals(exchange.getRequestCookies().get("token").getValue())) {
+							if (exchange.getQueryParameters().get("token") == null || exchange.getRequestCookie("token") == null || !exchange.getQueryParameters().get("token").getLast().equals(exchange.getRequestCookie("token").getValue())) {
 								String token = tokenGenerator.createSessionId();
 								exchange.setStatusCode(400);
 								exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/html");
