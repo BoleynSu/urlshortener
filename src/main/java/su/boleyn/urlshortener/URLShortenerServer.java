@@ -151,7 +151,7 @@ public class URLShortenerServer {
 
 							if (exchange.getQueryParameters().get("token") == null || exchange.getRequestCookie("token") == null || !exchange.getQueryParameters().get("token").getLast().equals(exchange.getRequestCookie("token").getValue())) {
 								String token = tokenGenerator.createSessionId();
-								exchange.setStatusCode(400);
+								exchange.setStatusCode(200);
 								exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/html");
 								exchange.getResponseHeaders().put(Headers.X_FRAME_OPTIONS, "deny");
 								exchange.setResponseCookie(new CookieImpl("token", token));
