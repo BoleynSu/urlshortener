@@ -1,4 +1,4 @@
-FROM maven@sha256:3c343205b17e59aa0756c936bf8c18f06e4145ad02dce28f3e258dcd18cfe8b3 as build
+FROM maven@sha256:aea55d01edac9df38eb17d19f6aabb55263f93cc8b23ac170a792922111ea487 as build
 RUN microdnf install -y shadow-utils && useradd builder
 WORKDIR /build
 RUN chown builder:builder /build
@@ -10,7 +10,7 @@ RUN mkdir -p out
 RUN mvn help:evaluate -q -Dexpression=project.version -DforceStdout > out/version
 RUN mv target/urlshortener-$(cat out/version)-jar-with-dependencies.jar out/urlshortener.jar
 
-FROM openjdk@sha256:19f0bd1671efc23d903cde8f8eb5ad9e43ebad8ee8a09f3b3ecf6c1614fb4f06
+FROM openjdk@sha256:6cc52266ea6e7b7a85df562063b666ff69c1273abd9dce7ab196849d0d5bde3f
 RUN microdnf install -y shadow-utils && microdnf clean all
 COPY --from=build /build/out /urlshortener
 
