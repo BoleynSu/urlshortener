@@ -1,4 +1,4 @@
-FROM maven@sha256:aea55d01edac9df38eb17d19f6aabb55263f93cc8b23ac170a792922111ea487 as build
+FROM maven@sha256:95de2b5763a6542ea9f4c2cbd954bbdc3d41d9629a914928e1d2bec1adfe7243 as build
 RUN microdnf install -y shadow-utils && useradd builder
 WORKDIR /build
 RUN chown builder:builder /build
