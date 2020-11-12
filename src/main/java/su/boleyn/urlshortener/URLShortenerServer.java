@@ -76,7 +76,7 @@ public class URLShortenerServer {
 								exchange.getResponseSender().send("404 Not Found");
 							} else {
 								exchange.setStatusCode(200);
-								exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
+								exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain; charset=UTF-8");
 								StringBuffer sb = new StringBuffer();
 								sb.append("code: " + code + "\n\n\n");
 								for (URLInfo info : history) {
@@ -91,7 +91,7 @@ public class URLShortenerServer {
 						@Override
 						public void handleRequest(final HttpServerExchange exchange) throws Exception {
 							exchange.setStatusCode(200);
-							exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
+							exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain; charset=UTF-8");
 							Map<String, String> list = shortener.getAll();
 							StringBuffer sb = new StringBuffer();
 							for (Entry<String, String> entry : list.entrySet()) {
@@ -168,7 +168,7 @@ public class URLShortenerServer {
 							shortener.shorten(info);
 
 							exchange.setStatusCode(200);
-							exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain");
+							exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "text/plain; charset=UTF-8");
 							StringBuffer sb = new StringBuffer();
 							sb.append("code: " + code + "\n\n\n");
 							sb.append("url: " + info.url + "\n");
