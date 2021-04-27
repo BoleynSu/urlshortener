@@ -7,7 +7,7 @@ RUN mkdir -p out
 RUN mvn help:evaluate -q -Dexpression=project.version -DforceStdout > out/version
 RUN mv target/urlshortener-$(cat out/version)-jar-with-dependencies.jar out/urlshortener.jar
 
-FROM docker.io/library/openjdk@sha256:3f032cf26beef3150eb2abb5144dfdbfdf9d25cef0580d8b68af9eb0035d47db
+FROM docker.io/library/openjdk@sha256:fa5414c6c4f8f836308947ae46daf65f2bce39ac01e89edfbe730cd0703dca06
 RUN microdnf install -y shadow-utils && microdnf clean all
 COPY --from=builder /build/out /urlshortener
 
