@@ -1,4 +1,4 @@
-FROM docker.io/library/maven@sha256:0f0c8cfc0718c32f0c8c509403d64eaea54402167251f1150fa51f8f97a9c566 AS builder
+FROM docker.io/library/maven@sha256:56c6902ac8abd47bf653908911a21e21dc0a10446329172c813434e631af51d1 AS builder
 WORKDIR /build
 COPY ./ ./
 
