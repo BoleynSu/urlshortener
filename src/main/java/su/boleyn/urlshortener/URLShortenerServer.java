@@ -194,10 +194,24 @@ public class URLShortenerServer {
 		server.start();
 	}
 
+	protected static String getOrElse(String name, String defaultValue) {
+		return System.getenv().getOrDefault(name, System.getProperty(name, defaultValue));
+	}
+
+	protected static String getOrFail(String name) {
+		String ret = getOrElse(name, null);
+		if (ret == null) {
+			throw new RuntimeException(name + " must be set");
+		}
+		return ret;
+	}
+
 	public static void main(final String[] args) {
-		new URLShortenerServer(System.getProperty("urlshortener-db", "urlshortener-db"),
-				Integer.parseInt(System.getProperty("urlshortener-port", "8080")),
-				System.getProperty("urlshortener-host", "localhost"), System.getProperty("urlshortener-username"),
-				System.getProperty("urlshortener-password")).start();
+		new URLShortenerServer(
+				getOrElse("DB", "urlshortener.db"),
+				Integer.parseInt(getOrElse("PORT", "8080")),
+				getOrElse("HOST", "localhost"),
+				getOrFail("URLSHORTENER_USERNAME"),
+				getOrFail("URLSHORTENER_PASSWORD")).start();
 	}
 }
